@@ -20,12 +20,22 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	// jpa -> db 의존성이 없으면 에러남
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
 	// thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
 	// bootstrap
 	implementation 'org.webjars:bootstrap:5.3.6'
+
+	// postgresql
+	runtimeOnly 'org.postgresql:postgresql'
+
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 
 	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
