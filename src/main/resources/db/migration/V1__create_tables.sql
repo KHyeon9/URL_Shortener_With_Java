@@ -1,4 +1,3 @@
--- always로 설정할 경우 실행시 마다 create table을 하기 때문에 오류 발생
 CREATE TABLE users
 (
     id         BIGSERIAL PRIMARY KEY,
