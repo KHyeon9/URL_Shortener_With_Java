@@ -19,6 +19,15 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+	// bootstrap
+	implementation 'org.webjars:bootstrap:5.3.6'
+
+	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -27,6 +36,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+// 테스트 소스 디렉토리를 커스터마이징
 sourceSets {
 	test {
 		java {
