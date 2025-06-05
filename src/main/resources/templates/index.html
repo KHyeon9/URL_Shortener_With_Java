@@ -13,6 +13,41 @@
   <div class="jumbotron bg-light p-5 rounded-3 my-4">
     <p class="lead">간단한 URL shortener 서비스. 짧게 만들고, 링크를 쉽게 공유하세요.</p>
   </div>
+
+  <h2 class="mt-5">Public Shortened URLs</h2>
+  <div th:if="${shortUrls.isEmpty()}" class="alert alert-info">
+    아직 public URL들이 만들어지지 않았습니다.
+  </div>
+  <div th:unless="${shortUrls.isEmpty()}" class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead>
+      <tr>
+        <th>Short URL</th>
+        <th>Original URL</th>
+        <th>Created By</th>
+        <th>Created</th>
+        <th>Expires</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="url : ${shortUrls}">
+        <td>
+          <a th:href="@{/s/{key}(key=${url.shortKey})}"
+             th:text="${baseUrl + '/s/' + url.shortKey}"
+             target="_blank"></a>
+        </td>
+        <td>
+          <a th:href="${url.originalUrl}"
+             th:text="${#strings.abbreviate(url.originalUrl, 50)}"
+             target="_blank"></a>
+        </td>
+        <td th:text="${url.createdBy != null ? url.createdBy.name : 'Guest'}"></td>
+        <td th:text="${#temporals.format(url.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${url.expiredAt != null ? #temporals.format(url.expiredAt, 'yyyy-MM-dd HH:mm') : 'Never'}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 </body>
 </html>

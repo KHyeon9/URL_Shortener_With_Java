@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true # sql을 볼 수 있도록 설정
+  docker:
+    compose:
+      # 프로젝트가 종료해도 docker compose로 실행된 것이 종료 되지않음
+      # 기본 값은 프로젝트 실행과 종료에 같이 시작되고 종료됨
+      lifecycle-management: start_only 

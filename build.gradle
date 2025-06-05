@@ -20,12 +20,29 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	// jpa -> db 의존성이 없으면 에러남
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// docker
+	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
 	// thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
 	// bootstrap
 	implementation 'org.webjars:bootstrap:5.3.6'
+
+	// postgresql
+	runtimeOnly 'org.postgresql:postgresql'
+
+	// flyway
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 
 	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
