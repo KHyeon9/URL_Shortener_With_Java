@@ -23,6 +23,9 @@ dependencies {
 	// jpa -> db 의존성이 없으면 에러남
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+	// docker
+	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
 	// thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
