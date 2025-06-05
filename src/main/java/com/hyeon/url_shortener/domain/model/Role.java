@@ -1,4 +1,4 @@
-package com.hyeon.url_shortener.model;
+package com.hyeon.url_shortener.domain.model;
 
 public enum Role {
     ROLE_USER, ROLE_ADMIN
