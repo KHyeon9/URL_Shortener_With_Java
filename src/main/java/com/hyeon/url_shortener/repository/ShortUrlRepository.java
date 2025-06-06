@@ -28,4 +28,7 @@ public interface ShortUrlRepository extends JpaRepository<ShortUrl, Long> {
     )
     @EntityGraph(attributePaths = {"createdBy"})
     List<ShortUrl> findPublicShortUrls();
+    
+    // short key가 존재하는지 확인
+    boolean existsByShortKey(String shortKey);
 }
