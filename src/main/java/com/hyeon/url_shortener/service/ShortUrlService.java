@@ -1,6 +1,6 @@
 package com.hyeon.url_shortener.service;
 
-import com.hyeon.url_shortener.domain.entity.ShortUrl;
+import com.hyeon.url_shortener.domain.model.ShortUrlDto;
 import com.hyeon.url_shortener.repository.ShortUrlRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,9 @@ public class ShortUrlService {
     }
 
     // private가 아닌 short url들을 모두 조회
-    public List<ShortUrl> findAllPublicShortUrls() {
-        return shortUrlRepository.findPublicShortUrls();
+    public List<ShortUrlDto> findAllPublicShortUrls() {
+
+        return shortUrlRepository.findPublicShortUrls()
+                .stream().map(ShortUrlDto::fromEntity).toList();
     }
 }
