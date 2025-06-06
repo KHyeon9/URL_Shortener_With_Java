@@ -43,4 +43,35 @@ public class ShortUrl {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    protected ShortUrl() {}
+
+    private ShortUrl (
+            String shortKey,
+            String originalUrl,
+            Boolean isPrivate,
+            Instant expiredAt,
+            User createdBy,
+            Long clickCount,
+            Instant createdAt
+    ) {
+        this.shortKey = shortKey;
+        this.originalUrl = originalUrl;
+        this.isPrivate = isPrivate;
+        this.expiredAt = expiredAt;
+        this.createdBy = createdBy;
+        this.clickCount = clickCount;
+        this.createdAt = createdAt;
+    }
+
+    public static ShortUrl of (
+            String shortKey,
+            String originalUrl,
+            Boolean isPrivate,
+            Instant expiredAt,
+            User createdBy,
+            Long clickCount,
+            Instant createdAt
+    ) {
+        return new ShortUrl(shortKey, originalUrl, isPrivate, expiredAt, createdBy, clickCount, createdAt);
+    }
 }
