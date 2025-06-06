@@ -5,8 +5,16 @@ spring:
     password: postgres
   jpa:
     show-sql: true # sql을 볼 수 있도록 설정
+    # view에서 지연 로딩과 같은 영속성 컨테이너의 특징을 사용 못하도록 false
+    # 성능 문제가 생길 수 있음 (n + 1 문제)
+    open-in-view: false
   docker:
     compose:
       # 프로젝트가 종료해도 docker compose로 실행된 것이 종료 되지않음
       # 기본 값은 프로젝트 실행과 종료에 같이 시작되고 종료됨
-      lifecycle-management: start_only 
+      lifecycle-management: start_only
+# app config
+app:
+  base-url: http://localhost:8080
+  default-expiry-in-days: 30
+  validate-original-url: true
