@@ -1,6 +1,7 @@
 package com.hyeon.url_shortener.web.controller;
 
 import com.hyeon.url_shortener.ApplicationProperties;
+import com.hyeon.url_shortener.domain.exception.ShortUrlNotFoundException;
 import com.hyeon.url_shortener.domain.model.CreateShortUrlCmd;
 import com.hyeon.url_shortener.domain.model.ShortUrlDto;
 import com.hyeon.url_shortener.web.dto.CreateShortUrlForm;
@@ -11,10 +12,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class HomeContriller {
@@ -65,5 +68,18 @@ public class HomeContriller {
                     "errorMessage", "Short Url을 만드는데 실패했습니다.");
         }
         return "redirect:/";
+    }
+
+    @GetMapping("/s/{shortKey}")
+    String redirectToOriginalUrl(@PathVariable("shortKey") String shortKey) {
+        Optional<ShortUrlDto> shortUrlDtoOptional = shortUrlService.accessShortUrl(shortKey);
+
+        if (shortUrlDtoOptional.isEmpty()) {
+            throw new ShortUrlNotFoundException("유효하지 않은 Short Key 입니다: " + shortKey);
+        }
+
+        ShortUrlDto shortUrlDto = shortUrlDtoOptional.get();
+
+        return "redirect:" + shortUrlDto.originalUrl();
     }
 }
