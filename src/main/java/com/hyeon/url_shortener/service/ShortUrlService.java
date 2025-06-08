@@ -6,11 +6,13 @@ import com.hyeon.url_shortener.domain.model.CreateShortUrlCmd;
 import com.hyeon.url_shortener.domain.model.ShortUrlDto;
 import com.hyeon.url_shortener.repository.ShortUrlRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ShortUrlService {
@@ -35,6 +37,7 @@ public class ShortUrlService {
     }
 
     // short url 생성
+    @Transactional
     public ShortUrlDto createShortUrl(CreateShortUrlCmd cmd) {
         if (properties.validateOriginalUrl()) {
             boolean urlExists = UrlExistenceValidator.isUrlExists(cmd.originalUrl());
@@ -60,6 +63,7 @@ public class ShortUrlService {
         return ShortUrlDto.fromEntity(shortUrl);
     }
 
+    // 유니크한 short key 생성
     private String generateUniqueShortKey() {
         String shortKey;
         do {
@@ -77,5 +81,27 @@ public class ShortUrlService {
             sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
         }
         return sb.toString();
+    }
+
+    // shortKey를 가지고 원래 주소 가져오기
+    @Transactional
+    public Optional<ShortUrlDto> accessShortUrl(String shortKey) {
+        Optional<ShortUrl> shortUrlOptional = shortUrlRepository.findByShortKey(shortKey);
+
+        if (shortUrlOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        ShortUrl shortUrl = shortUrlOptional.get();
+        System.out.println("shortUrl : " + shortUrl.getOriginalUrl());
+
+        if (shortUrl.getExpiredAt() != null && shortUrl.getExpiredAt().isBefore(Instant.now())) {
+            return Optional.empty();
+        }
+
+        // 클릭 카운트 증가
+        shortUrl.setClickCount(shortUrl.getClickCount() + 1);
+        shortUrlRepository.save(shortUrl);
+        return Optional.of(ShortUrlDto.fromEntity(shortUrl));
     }
 }
