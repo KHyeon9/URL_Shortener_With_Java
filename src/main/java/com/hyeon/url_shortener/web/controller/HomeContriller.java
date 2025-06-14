@@ -23,21 +23,31 @@ import java.util.Optional;
 public class HomeContriller {
 
     private final ShortUrlService shortUrlService;
+    private final SecurityUtils securityUtils;
     private final ApplicationProperties properties;
 
-    public HomeContriller(ShortUrlService shortUrlService, ApplicationProperties properties) {
+    public HomeContriller(ShortUrlService shortUrlService, SecurityUtils securityUtils, ApplicationProperties properties) {
         this.shortUrlService = shortUrlService;
+        this.securityUtils = securityUtils;
         this.properties = properties;
     }
 
     // 홈 화면으로 이동
     @GetMapping("/")
     public String home(Model model) {
+        securityUtils.getCurrentUser();
+
         List<ShortUrlDto> shortUrls = shortUrlService.findAllPublicShortUrls();
         model.addAttribute("shortUrls", shortUrls);
         model.addAttribute("baseUrl", properties.baseUrl());
         model.addAttribute("createShortUrlForm", new CreateShortUrlForm(""));
         return "index";
+    }
+
+    // 로그인 페이지
+    @GetMapping("/login")
+    String loginForm() {
+        return "login";
     }
 
     // short url 생성
