@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     String handleException(Exception ex) {
-        log.error("핸들링 되자않은 오류: {}", ex.getMessage());
+        log.error("핸들링 되지않은 오류: {}", ex.getMessage());
         return "error/500";
     }
 }
