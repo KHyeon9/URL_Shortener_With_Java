@@ -74,4 +74,22 @@ public class ShortUrl {
     ) {
         return new ShortUrl(shortKey, originalUrl, isPrivate, expiredAt, createdBy, clickCount, createdAt);
     }
+
+    public static ShortUrl of (
+            String shortKey,
+            String originalUrl,
+            Instant expiredAt,
+            Long clickCount,
+            Instant createdAt
+    ) {
+        return new ShortUrl(
+                shortKey,
+                originalUrl,
+                false,
+                expiredAt,
+                null,
+                clickCount,
+                createdAt)
+            ;
+    }
 }

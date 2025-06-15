@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
@@ -22,16 +23,28 @@
       <form th:action="@{/short-urls}" method="post"
             th:object="${createShortUrlForm}">
         <div class="mb-3">
-          <label for="originalUrl" class="form-label">Original URL</label>
+          <label for="originalUrl" class="form-label">변경할 URL</label>
           <input type="text" class="form-control" id="originalUrl"
                  th:field="*{originalUrl}"
-                 placeholder="https://example.com/my-long-url">
+                 placeholder="https://example.com">
           <div class="text-danger"
                th:if="${#fields.hasErrors('originalUrl')}"
                th:errors="*{originalUrl}"></div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Shorten URL</button>
+        <div class="mb-3" sec:authorize="isAuthenticated()">
+          <label for="expirationInDays" class="form-label">만료일</label>
+          <input type="number" class="form-control" id="expirationInDays"
+                 th:field="*{expirationInDays}"
+                 min="1" max="365">
+          <div class="form-text">만료일을 사용하지 않으려면 비워두세요</div>
+        </div>
+        <div class="mb-3 form-check" sec:authorize="isAuthenticated()">
+          <input type="checkbox" class="form-check-input" id="isPrivate" th:field="*{isPrivate}">
+          <label class="form-check-label" for="isPrivate">Private (나만 연결 가능)</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">단축 URL 생성</button>
       </form>
     </div>
   </div>

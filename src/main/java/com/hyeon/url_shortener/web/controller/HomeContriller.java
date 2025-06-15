@@ -40,7 +40,8 @@ public class HomeContriller {
         List<ShortUrlDto> shortUrls = shortUrlService.findAllPublicShortUrls();
         model.addAttribute("shortUrls", shortUrls);
         model.addAttribute("baseUrl", properties.baseUrl());
-        model.addAttribute("createShortUrlForm", new CreateShortUrlForm(""));
+        model.addAttribute("createShortUrlForm",
+                new CreateShortUrlForm("", false, null));
         return "index";
     }
 
@@ -68,7 +69,13 @@ public class HomeContriller {
         }
 
         try {
-            CreateShortUrlCmd cmd = new CreateShortUrlCmd(form.originalUrl());
+            Long userId = securityUtils.getCurrentUserId();
+            CreateShortUrlCmd cmd = new CreateShortUrlCmd(
+                    form.originalUrl(),
+                    form.isPrivate(),
+                    form.expirationInDays(),
+                    userId
+            );
             ShortUrlDto shortUrlDto = shortUrlService.createShortUrl(cmd);
             redirectAttributes.addFlashAttribute(
                     "successMessage", "Short Url이 정상적으로 만들어 졌습니다. " +
@@ -82,7 +89,8 @@ public class HomeContriller {
 
     @GetMapping("/s/{shortKey}")
     String redirectToOriginalUrl(@PathVariable("shortKey") String shortKey) {
-        Optional<ShortUrlDto> shortUrlDtoOptional = shortUrlService.accessShortUrl(shortKey);
+        Long userId = securityUtils.getCurrentUserId();
+        Optional<ShortUrlDto> shortUrlDtoOptional = shortUrlService.accessShortUrl(shortKey, userId);
 
         if (shortUrlDtoOptional.isEmpty()) {
             throw new ShortUrlNotFoundException("유효하지 않은 Short Key 입니다: " + shortKey);
