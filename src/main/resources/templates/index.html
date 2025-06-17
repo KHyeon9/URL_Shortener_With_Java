@@ -14,7 +14,7 @@
   <div class="jumbotron bg-light p-5 rounded-3 my-4">
     <p class="lead">간단한 URL shortener 서비스. 짧게 만들고, 링크를 쉽게 공유하세요!</p>
   </div>
-
+  <!-- short url 생성폼 -->
   <div class="card mt-4">
     <div class="card-header">
       <h5 class="card-title mb-0">Short URL 만들기</h5>
@@ -31,7 +31,6 @@
                th:if="${#fields.hasErrors('originalUrl')}"
                th:errors="*{originalUrl}"></div>
         </div>
-
         <div class="mb-3" sec:authorize="isAuthenticated()">
           <label for="expirationInDays" class="form-label">만료일</label>
           <input type="number" class="form-control" id="expirationInDays"
@@ -43,17 +42,17 @@
           <input type="checkbox" class="form-check-input" id="isPrivate" th:field="*{isPrivate}">
           <label class="form-check-label" for="isPrivate">Private (나만 연결 가능)</label>
         </div>
-
         <button type="submit" class="btn btn-primary">단축 URL 생성</button>
       </form>
     </div>
   </div>
-
+  <!-- 에러 발생시 출력 -->
   <h2 class="mt-5">Public Shortened URLs</h2>
-  <div th:if="${shortUrls.isEmpty()}" class="alert alert-info">
+  <div th:if="${shortUrls.data.isEmpty()}" class="alert alert-info">
     아직 public URL들이 만들어지지 않았습니다.
   </div>
-  <div th:unless="${shortUrls.isEmpty()}" class="table-responsive">
+  <!-- short url 리스트 -->
+  <div th:unless="${shortUrls.data.isEmpty()}" class="table-responsive">
     <table class="table table-striped table-hover">
       <thead>
       <tr>
@@ -61,11 +60,11 @@
         <th>Original URL</th>
         <th>Created By</th>
         <th>Created</th>
-        <th>Expires</th>
+        <th>Expired At</th>
       </tr>
       </thead>
       <tbody>
-      <tr th:each="url : ${shortUrls}">
+      <tr th:each="url : ${shortUrls.data}">
         <td>
           <a th:href="@{/s/{key}(key=${url.shortKey})}"
              th:text="${baseUrl + '/s/' + url.shortKey}"
@@ -82,6 +81,8 @@
       </tr>
       </tbody>
     </table>
+    <!--  pagination  -->
+    <div th:insert="~{pagination}"></div>
   </div>
 </div>
 </body>
