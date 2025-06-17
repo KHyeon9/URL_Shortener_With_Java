@@ -4,9 +4,14 @@ import com.hyeon.url_shortener.ApplicationProperties;
 import com.hyeon.url_shortener.domain.entity.ShortUrl;
 import com.hyeon.url_shortener.domain.entity.User;
 import com.hyeon.url_shortener.domain.model.CreateShortUrlCmd;
+import com.hyeon.url_shortener.domain.model.PagedResult;
 import com.hyeon.url_shortener.domain.model.ShortUrlDto;
 import com.hyeon.url_shortener.repository.ShortUrlRepository;
 import com.hyeon.url_shortener.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +40,15 @@ public class ShortUrlService {
     }
 
     // private가 아닌 short url들을 모두 조회
-    public List<ShortUrlDto> findAllPublicShortUrls() {
+    public PagedResult<ShortUrlDto> findAllPublicShortUrls(int pageNo, int pageSize) {
+        pageNo = pageNo > 1 ? pageNo - 1 : 0;
+        Pageable pageable = PageRequest
+                .of(pageNo, pageSize, Sort.Direction.DESC, "createdBy");
+        Page<ShortUrlDto> shortUrlDataPage = shortUrlRepository
+                .findPublicShortUrls(pageable)
+                .map(ShortUrlDto::fromEntity);
 
-        return shortUrlRepository.findPublicShortUrls()
-                .stream().map(ShortUrlDto::fromEntity).toList();
+        return PagedResult.from(shortUrlDataPage);
     }
 
     // short url 생성
