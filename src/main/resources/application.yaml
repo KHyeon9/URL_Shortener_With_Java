@@ -8,6 +8,10 @@ spring:
     # view에서 지연 로딩과 같은 영속성 컨테이너의 특징을 사용 못하도록 false
     # 성능 문제가 생길 수 있음 (n + 1 문제)
     open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
   docker:
     compose:
       # 프로젝트가 종료해도 docker compose로 실행된 것이 종료 되지않음
@@ -18,3 +22,4 @@ app:
   base-url: http://localhost:8080
   default-expiry-in-days: 30
   validate-original-url: true
+  page-size: 10
