@@ -41,14 +41,28 @@ public class ShortUrlService {
 
     // private가 아닌 short url들을 모두 조회
     public PagedResult<ShortUrlDto> findAllPublicShortUrls(int pageNo, int pageSize) {
-        pageNo = pageNo > 1 ? pageNo - 1 : 0;
-        Pageable pageable = PageRequest
-                .of(pageNo, pageSize, Sort.Direction.DESC, "createdBy");
+        Pageable pageable = getPageable(pageNo, pageSize);
         Page<ShortUrlDto> shortUrlDataPage = shortUrlRepository
                 .findPublicShortUrls(pageable)
                 .map(ShortUrlDto::fromEntity);
 
         return PagedResult.from(shortUrlDataPage);
+    }
+
+    // userId를 통한 short urls 조회
+    public PagedResult<ShortUrlDto> getUserShortUrls(Long userId, int pageNo, int pageSize) {
+        Pageable pageable = getPageable(pageNo, pageSize);
+        Page<ShortUrlDto> shortUrlPage = shortUrlRepository.findByCreatedById(userId, pageable)
+                .map(ShortUrlDto::fromEntity);
+        return PagedResult.from(shortUrlPage);
+    }
+
+    // admin에서 사용할 전체 short urls 조회
+    public PagedResult<ShortUrlDto> findAllShortUrls(int pageNo, int pageSize) {
+        Pageable pageable = getPageable(pageNo, pageSize);
+        Page<ShortUrlDto> shortUrlsPage = shortUrlRepository.findAllShortUrls(pageable)
+                .map(ShortUrlDto::fromEntity);
+        return PagedResult.from(shortUrlsPage);
     }
 
     // short url 생성
@@ -95,24 +109,12 @@ public class ShortUrlService {
         return ShortUrlDto.fromEntity(shortUrl);
     }
 
-    // 유니크한 short key 생성
-    private String generateUniqueShortKey() {
-        String shortKey;
-        do {
-            shortKey = generateRandomShortKey();
-        } while (shortUrlRepository.existsByShortKey(shortKey));
-
-        return shortKey;
-    }
-
-    // 랜덤 short key 생성
-    public static String generateRandomShortKey() {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < SHORT_KEY_LENGTH; i++) {
-            sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
+    // user id에 따른 short url 삭제
+    @Transactional
+    public void deleteUserShortUrls(List<Long> ids, Long userId) {
+        if (ids != null && !ids.isEmpty() && userId != null) {
+            shortUrlRepository.deleteByIdInAndCreatedById(ids, userId);
         }
-        return sb.toString();
     }
 
     // shortKey를 가지고 원래 주소 가져오기
@@ -141,5 +143,31 @@ public class ShortUrlService {
         shortUrl.setClickCount(shortUrl.getClickCount() + 1);
         shortUrlRepository.save(shortUrl);
         return Optional.of(ShortUrlDto.fromEntity(shortUrl));
+    }
+
+    // 중복 pagenation 부분 분리
+    public Pageable getPageable(int pageNo, int pageSize) {
+        pageNo = pageNo > 1 ? pageNo - 1 : 0;
+        return PageRequest.of(pageNo, pageSize, Sort.Direction.DESC, "createdBy");
+    }
+
+    // 유니크한 short key 생성
+    private String generateUniqueShortKey() {
+        String shortKey;
+        do {
+            shortKey = generateRandomShortKey();
+        } while (shortUrlRepository.existsByShortKey(shortKey));
+
+        return shortKey;
+    }
+
+    // 랜덤 short key 생성
+    public static String generateRandomShortKey() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < SHORT_KEY_LENGTH; i++) {
+            sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
+        }
+        return sb.toString();
     }
 }
