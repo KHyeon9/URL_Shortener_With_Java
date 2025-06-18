@@ -1,6 +1,7 @@
 package com.hyeon.url_shortener.domain.model;
 
 import com.hyeon.url_shortener.domain.entity.ShortUrl;
+import com.hyeon.url_shortener.domain.entity.User;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -21,8 +22,8 @@ public record ShortUrlDto(
 
     public static ShortUrlDto fromEntity(ShortUrl entity) {
         UserDto userDto = null;
-        if (entity.getCreatedBy() != null) {
-            userDto = UserDto.fromEntity(entity.getCreatedBy());
+        if(entity.getCreatedBy() != null) {
+            userDto = toUserDto(entity.getCreatedBy());
         }
         return new ShortUrlDto(
                 entity.getId(),
@@ -34,5 +35,9 @@ public record ShortUrlDto(
                 entity.getClickCount(),
                 entity.getCreatedAt()
         );
+    }
+
+    private static UserDto toUserDto(User user) {
+        return new UserDto(user.getId(), user.getName());
     }
 }
