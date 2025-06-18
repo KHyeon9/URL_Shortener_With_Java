@@ -46,7 +46,24 @@ public class HomeContriller {
         this.addShortUrlDataToModel(model, page);
         model.addAttribute("createShortUrlForm",
                 new CreateShortUrlForm("", false, null));
+        model.addAttribute("paginationUrl", "/");
         return "index";
+    }
+
+    // 내 short urls 조회
+    @GetMapping("/my-urls")
+    public String showUserUrls(
+            @RequestParam(defaultValue = "1") int page,
+            Model model
+    ) {
+        Long currentUserId = securityUtils.getCurrentUserId();
+        PagedResult<ShortUrlDto> myUrls =
+                shortUrlService.getUserShortUrls(currentUserId, page, properties.pageSize());
+        model.addAttribute("shortUrls", myUrls);
+        model.addAttribute("baseUrl", properties.baseUrl());
+        model.addAttribute("paginationUrl", "/my-urls");
+
+        return "my-urls";
     }
 
     // short url 생성
@@ -83,6 +100,33 @@ public class HomeContriller {
                     "errorMessage", "Short Url을 만드는데 실패했습니다.");
         }
         return "redirect:/";
+    }
+
+    // short urls 삭제
+    @PostMapping("/delete-urls")
+    public String deleteUrls(
+            @RequestParam(value = "ids", required = false) List<Long> ids,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (ids == null || ids.isEmpty()) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage", "삭제할 URL이 선택되지 않았습니다."
+            );
+            return "redirect:/my-urls";
+        }
+
+        try {
+            Long currentUserId = securityUtils.getCurrentUserId();
+            shortUrlService.deleteUserShortUrls(ids, currentUserId);
+            redirectAttributes.addFlashAttribute(
+                    "successMessage", "선택한 URL이 성공적으로 삭제되었습니다"
+            );
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage", "URL 삭제 오류: " + e.getMessage()
+            );
+        }
+        return "redirect:/my-urls";
     }
 
     // short url을 가지고 변환전 주소로 리다이렉트
