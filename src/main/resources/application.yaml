@@ -12,6 +12,10 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
   docker:
     compose:
       # 프로젝트가 종료해도 docker compose로 실행된 것이 종료 되지않음
