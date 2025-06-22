@@ -37,4 +37,17 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    protected User() {}
+
+    private User(String email, String password, String name, Role role, Instant createdAt) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.role = role;
+        this.createdAt = createdAt;
+    }
+
+    public static User of (String email, String password, String name, Role role, Instant createdAt) {
+        return new User(email, password, name, role, createdAt);
+    }
 }
