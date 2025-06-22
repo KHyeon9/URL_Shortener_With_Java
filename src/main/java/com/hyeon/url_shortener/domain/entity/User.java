@@ -1,6 +1,7 @@
 package com.hyeon.url_shortener.domain.entity;
 
 import com.hyeon.url_shortener.domain.model.Role;
+import com.hyeon.url_shortener.domain.model.UserRedisDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +40,8 @@ public class User {
 
     protected User() {}
 
-    private User(String email, String password, String name, Role role, Instant createdAt) {
+    private User(Long id, String email, String password, String name, Role role, Instant createdAt) {
+        this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
@@ -47,7 +49,22 @@ public class User {
         this.createdAt = createdAt;
     }
 
+    public static User fromRedisDto(UserRedisDto dto) {
+        return User.of(
+                dto.id(),
+                dto.email(),
+                dto.password(),
+                dto.name(),
+                dto.role(),
+                dto.createdAt()
+        );
+    }
+
+    public static User of (Long id, String email, String password, String name, Role role, Instant createdAt) {
+        return new User(id, email, password, name, role, createdAt);
+    }
+
     public static User of (String email, String password, String name, Role role, Instant createdAt) {
-        return new User(email, password, name, role, createdAt);
+        return new User(null, email, password, name, role, createdAt);
     }
 }
