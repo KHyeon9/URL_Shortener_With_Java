@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class HomeContriller {
+public class HomeController {
 
     private final ShortUrlService shortUrlService;
     private final SecurityUtils securityUtils;
     private final ApplicationProperties properties;
 
-    public HomeContriller(ShortUrlService shortUrlService, SecurityUtils securityUtils, ApplicationProperties properties) {
+    public HomeController(ShortUrlService shortUrlService, SecurityUtils securityUtils, ApplicationProperties properties) {
         this.shortUrlService = shortUrlService;
         this.securityUtils = securityUtils;
         this.properties = properties;
