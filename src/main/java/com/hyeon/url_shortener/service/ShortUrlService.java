@@ -3,11 +3,13 @@ package com.hyeon.url_shortener.service;
 import com.hyeon.url_shortener.ApplicationProperties;
 import com.hyeon.url_shortener.domain.entity.ShortUrl;
 import com.hyeon.url_shortener.domain.entity.User;
-import com.hyeon.url_shortener.domain.model.CreateShortUrlCmd;
-import com.hyeon.url_shortener.domain.model.PagedResult;
-import com.hyeon.url_shortener.domain.model.ShortUrlDto;
+import com.hyeon.url_shortener.domain.model.*;
 import com.hyeon.url_shortener.repository.ShortUrlRepository;
+import com.hyeon.url_shortener.repository.UserRedisRepository;
 import com.hyeon.url_shortener.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,20 +24,30 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class ShortUrlService {
 
     private final ShortUrlRepository shortUrlRepository;
     private final UserRepository userRepository;
+    private final UserRedisRepository userRedisRepository;
     private final ApplicationProperties properties;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     // short url을 만들기 위한 변수들
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int SHORT_KEY_LENGTH = 6;
     private static final SecureRandom random = new SecureRandom();
 
-    public ShortUrlService(ShortUrlRepository shortUrlRepository, UserRepository userRepository, ApplicationProperties properties) {
+    public ShortUrlService(
+            ShortUrlRepository shortUrlRepository,
+            UserRepository userRepository,
+            UserRedisRepository userRedisRepository,
+            ApplicationProperties properties
+    ) {
         this.shortUrlRepository = shortUrlRepository;
         this.userRepository = userRepository;
+        this.userRedisRepository = userRedisRepository;
         this.properties = properties;
     }
 
@@ -88,7 +100,20 @@ public class ShortUrlService {
                     Instant.now()
             );
         } else {
-            User createdBy = userRepository.findById(cmd.userId()).orElseThrow();
+            User createdBy;
+            Optional<UserRedisDto> foundUser = userRedisRepository.findById(cmd.userId());
+            
+            // redis 로직
+            if (foundUser.isEmpty()) {
+                logger.info("Redis에 데이터가 없습니다.");
+                createdBy = userRepository.findById(cmd.userId()).orElseThrow();
+                UserRedisDto userRedisDto = UserRedisDto.fromEntity(createdBy);
+                userRedisRepository.save(userRedisDto);
+            } else {
+                logger.info("Redis에 데이터가 있습니다.");
+                createdBy = User.fromRedisDto(foundUser.get());
+            }
+            
             Boolean isPrivate = cmd.isPrivate() == null ? false : cmd.isPrivate();
             Instant expiredAt = cmd.expirationInDays() != null ?
                     Instant.now().plus(cmd.expirationInDays(), ChronoUnit.DAYS) : null;
